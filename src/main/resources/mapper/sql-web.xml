@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.webproj2.web.mapper.WebMapper">
+    <select id="selectWebList" resultType="com.example.webproj2.web.dto.WebDto">
+		<![CDATA[
+        SELECT
+            web_idx,
+            title,
+            hit_cnt,
+            DATE_FORMAT(created_datetime, '%Y.%m.%d %H:%i:%s') AS created_datetime
+
+        FROM
+            t_web
+        WHERE
+            deleted_yn = 'N'
+        ORDER BY web_idx DESC
+        ]]>
+	</select>
+
+    <insert id="insertWeb" parameterType="com.example.webproj2.web.dto.WebDto" useGeneratedKeys="true" keyProperty="webIdx">
+		<![CDATA[
+        INSERT INTO t_web
+        (
+            title,
+            contents,
+            created_datetime,
+            creator_id
+        )
+        VALUES
+            (
+                #{title},
+                #{contents},
+                NOW(),
+                'admin'
+            )
+        ]]>
+	</insert>
+
+    <select id="selectWebDetail" parameterType="int" resultType="com.example.webproj2.web.dto.WebDto">
+		<![CDATA[
+        SELECT
+            web_idx,
+            title,
+            contents,
+            hit_cnt,
+            DATE_FORMAT(created_datetime, '%Y.%m.%d %H:%i:%s') AS created_datetime,
+            creator_id
+        FROM
+            t_web
+        WHERE
+            web_idx = #{webIdx}
+          AND deleted_yn = 'N'
+        ]]>
+	</select>
+
+    <update id="updateHitCount" parameterType="int">
+		<![CDATA[
+        UPDATE
+            t_web
+        SET
+            hit_cnt = hit_cnt + 1
+        WHERE
+            web_idx = #{webIdx}
+        ]]>
+	</update>
+
+    <update id="updateWeb" parameterType="com.example.webproj2.web.dto.WebDto">
+		<![CDATA[
+        UPDATE t_board SET
+                           title = #{title},
+                           contents = #{contents},
+                           updated_datetime = Now(),
+                           updater_id = 'admin'
+        WHERE
+            web_idx = #{webIdx}
+        ]]>
+	</update>
+
+    <update id="deleteWeb" parameterType="int">
+		<![CDATA[
+        UPDATE t_web SET
+                           deleted_yn = 'Y',
+                           updated_datetime = Now(),
+                           updater_id = 'admin'
+        WHERE
+            web_idx = #{webIdx}
+        ]]>
+	</update>
+</mapper>
